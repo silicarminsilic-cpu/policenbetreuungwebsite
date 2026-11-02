@@ -756,7 +756,7 @@ const OPERATOR={ // Angaben wie auf unbetreute-police.ch (öffentlich abgerufen)
   name:'Esche Consulting GmbH',address:'Städtle 35, 9490 Vaduz, Liechtenstein',reg:'FL-0002.747.099-3 (Handelsregister Vaduz)',mail:'anfrage@policenbetreuung.ch',phone:'+423 798 77 33',
   privacyMail:'anfrage@policenbetreuung.ch',
   partner:{name:'Wertenburg GmbH',address:'Wuhrstrasse 6, 9490 Vaduz, Liechtenstein',reg:'FL-0002.695.823-8 (Handelsregister Vaduz)'},persons:['Armin Silic','Holger Winfried Roth']};
-const SITE={brand:'policenbetreuung.ch',webhook:'/api/leads.php'};
+const SITE={brand:'policenbetreuung.ch',webhook:'/leads.php'};
 
 const ICON={
   user:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5"/><path d="m16 11 2 2 4-4"/>',
@@ -1311,7 +1311,7 @@ async function submitForm(withMandate){
   F.busy=true;F.subErr='';renderForm();
   const lead=buildLead();let pay=null;
   try{
-    if(withMandate){pay=await buildMandatePayload(lead);lead.mandate_status='Unterzeichnet';await postJSON('/api/maklermandat.php',{lead,mandate:pay})}
+    if(withMandate){pay=await buildMandatePayload(lead);lead.mandate_status='Unterzeichnet';await postJSON('/maklermandat.php',{lead,mandate:pay})}
     else{lead.mandate_status='Vollmacht ausstehend';await apiLeads(lead)}
   }catch(e){F.busy=false;F.subErr=SUBERR;renderForm();return}
   F.busy=false;F.done=true;F.lead=lead;F.pay=pay;renderForm();track('form_submit_success',{campaign:F.camp||'allgemein',lang:F.d.lang,landing:CUR||'start',mandate:!!withMandate});if(withMandate)track('mandate_signed',{campaign:F.camp||'allgemein'});
