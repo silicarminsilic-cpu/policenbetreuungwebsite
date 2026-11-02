@@ -1,8 +1,9 @@
-<title>Policenbetreuung.ch</title>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Policenbetreuung.ch</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Persönliche Betreuung für bestehende Versicherungs- und Vorsorgeverträge in der Schweiz.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap">
+<script>try{if(!sessionStorage.getItem('pb_splash')&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('splash-on')}catch(e){}</script>
 <style>
 /* Layout concept: weisse Editorial-FinTech-Seite, schwebende Pill-Navigation, zentrierte Headline, darunter eine mehrschichtige Dokumentenkomposition auf dem Schreibtisch. Blau nur als Signal. */
 :root{
@@ -536,13 +537,46 @@ table.imp{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 14px}t
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media(max-width:700px){.cookie{left:10px;right:10px;bottom:10px;max-width:none}.ck-card{width:100%}}
 .sub-err{margin:14px 0 0;font-size:13.5px}
-</style>
-<header class="nav" id="nav"></header>
+
+/* Startanimation */
+.splash{display:none}
+.splash-on .splash{display:flex}
+.splash-on body{overflow:hidden}
+.splash-on .rise,.splash-on .E,.splash-on .F,.splash-on .cc::after{animation-play-state:paused!important}
+.splash{position:fixed;inset:0;z-index:200;background:var(--bg);color:var(--ink);align-items:center;justify-content:center;padding:24px;transition:opacity .6s ease,visibility .6s}
+.splash.out{opacity:0;visibility:hidden}
+.splash:before{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 50% 38%,rgba(0,152,242,.10),transparent 70%);pointer-events:none}
+.sp-inner{position:relative;max-width:760px;text-align:center}
+.sp-logo{display:inline-flex;align-items:center;gap:14px;font-family:var(--font-d);font-weight:600;font-size:clamp(22px,4vw,30px);letter-spacing:-.01em;animation:spLogo 1.4s cubic-bezier(.2,.7,.2,1) .3s both}
+.sp-logo b{color:var(--blue);font-weight:600}
+.sp-h{font-family:var(--font-d);font-weight:500;letter-spacing:-.025em;line-height:1.08;font-size:clamp(34px,6.4vw,66px);margin:34px 0 0}
+.sp-l{display:block;opacity:0;animation:spIn 1.2s cubic-bezier(.2,.7,.2,1) var(--t,0s) both}
+.sp-l2{color:var(--blue-ink)}
+.sp-p{font-size:clamp(17px,2.4vw,22px);line-height:1.5;color:var(--ink2);max-width:36em;margin:22px auto 0;opacity:0;animation:spInOut 3.2s ease var(--t,0s) both;position:absolute;left:0;right:0;top:100%}
+.sp-last{animation:spIn 1.2s ease var(--t,0s) both}
+.sp-skip,.splash-skip{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));right:20px;z-index:2;background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:99px;padding:9px 16px;font:500 14px var(--font-b);cursor:pointer}
+.splash-skip:hover{border-color:var(--blue)}
+.sp-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line2)}
+.sp-bar i{display:block;height:100%;width:100%;background:var(--blue);transform-origin:0 50%;transform:scaleX(0);animation:spBar 20s linear both}
+@keyframes spLogo{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes spIn{from{opacity:0;transform:translateY(16px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+@keyframes spInOut{0%{opacity:0;transform:translateY(14px)}12%,86%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
+@keyframes spBar{to{transform:scaleX(1)}}
+@media(max-width:560px){.sp-p{position:absolute}}
+.sp-inner{max-width:1000px}.sp-p{max-width:34em}
+</style></head><body><header class="nav" id="nav"></header>
 <div class="mobile-menu" id="mmenu"></div>
 <main id="app"></main>
 <div id="foot"></div>
 <div class="modal" id="modal"></div>
 <div class="sticky-cta" id="scta"></div>
+<div class="splash" id="splash" role="dialog" aria-label="Willkommen bei policenbetreuung.ch"><button class="splash-skip" id="splash-skip" type="button">Überspringen</button>
+<div class="sp-inner"><div class="sp-logo"><svg width="64" height="64" viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="8" fill="#0098f2"/><path d="M8 7.5h7l3 3V18a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V8.5a1 1 0 0 1 1-1z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="m10 13.2 1.8 1.8 3.4-3.6" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>policenbetreuung<b>.ch</b></span></div>
+<h2 class="sp-h"><span class="sp-l" style="--t:1.8s">Ihre Vorsorge ist geregelt.</span><span class="sp-l sp-l2" style="--t:5s">Ist Ihre Betreuung es auch?</span></h2>
+<p class="sp-p" style="--t:9s">Sie haben vorgesorgt. Doch wer kümmert sich heute um Ihre Policen?</p>
+<p class="sp-p" style="--t:12.5s">Ihr Berater ist nicht mehr erreichbar? Oder wünschen Sie sich mehr Betreuung?</p>
+<p class="sp-p sp-last" style="--t:16s">Sagen Sie uns, was Sie haben. Wir melden uns bei Ihnen.</p></div>
+<div class="sp-bar"><i></i></div></div>
 <script>
 /* ===== i18n: 13 Anfrage-Sprachen. Hero, Sprachbereich und das komplette Formular (inkl. Fehlermeldungen, Datenschutz, Bestätigung) sind übersetzt. ===== */
 const LANGS=[['de','Deutsch'],['fr','Français'],['it','Italiano'],['en','English'],['sq','Shqip'],['bs','Bosanski'],['hr','Hrvatski'],['sr','Srpski'],['tr','Türkçe'],['pt','Português'],['es','Español'],['pl','Polski'],['ru','Русский']];
@@ -1670,4 +1704,23 @@ function openCookies(detail){
   else if(CONSENT.stat)loadGoogle();
 })();
 
+/* ===== Startanimation (20 s, überspringbar, einmal pro Sitzung) ===== */
+(function(){
+  const el=document.getElementById('splash'),root=document.documentElement;
+  if(!el)return;
+  if(!root.classList.contains('splash-on')){el.remove();return}
+  let done=false;
+  function end(){
+    if(done)return;done=true;
+    try{sessionStorage.setItem('pb_splash','1')}catch(e){}
+    el.classList.add('out');
+    setTimeout(()=>{root.classList.remove('splash-on');el.remove();window.scrollTo(0,0)},600);
+  }
+  document.getElementById('splash-skip').addEventListener('click',end);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')end()});
+  setTimeout(end,20000);
+  document.getElementById('splash-skip').focus({preventScroll:true});
+})();
+
 </script>
+</body></html>
