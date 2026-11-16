@@ -1191,6 +1191,7 @@ const OPERATOR={ // Angaben wie auf unbetreute-police.ch (öffentlich abgerufen)
   partner:{name:'Wertenburg GmbH',address:'Wuhrstrasse 6, 9490 Vaduz, Liechtenstein',reg:'FL-0002.695.823-8 (Handelsregister Vaduz)'},persons:['Armin Silic','Holger Winfried Roth']};
 const API_BASE='https://api.policenbetreuung.ch'; // PHP-Schnittstelle bei Infomaniak (Mailversand)
 const FORM_URL='https://formsubmit.co/ajax/kontakt@arminsilic.de'; // Formularversand (FormSubmit)
+const FORM_URL_FILE='https://formsubmit.co/kontakt@arminsilic.de'; // Variante mit Dateianhang (PDF)
 const SITE={brand:'policenbetreuung.ch',webhook:FORM_URL};
 
 const ICON={
@@ -1740,15 +1741,19 @@ async function sendForm(lead,pay){
   fd.append('_template','table');fd.append('_captcha','false');
   if(lead.email)fd.append('_replyto',lead.email);
   if(lead.email)fd.append('_autoresponse','Guten Tag'+(lead.first_name?' '+lead.first_name:'')+'\n\nvielen Dank für Ihre Anfrage bei policenbetreuung.ch'+(pay?' und für Ihr online unterzeichnetes Maklermandat (Version '+pay.version+', '+pay.signed_at+', Referenz '+lead.lead_id+')':'')+'. Wir melden uns bei Ihnen.\n\nFreundliche Grüsse\nPolicenbetreuung.ch\n'+OPERATOR.mail+' | '+OPERATOR.phone);
-  Object.keys(lead).forEach(k=>{let v=lead[k];if(v==null||v==='')return;if(typeof v==='object')v=JSON.stringify(v);fd.append(k.charAt(0)==='_'?k.slice(1):k,String(v))});
+  const flat=v=>Array.isArray(v)?v.filter(x=>x!=null&&x!=='').join(', '):(v&&typeof v==='object'?Object.keys(v).filter(k=>v[k]!=null&&v[k]!=='').map(k=>k+': '+flat(v[k])).join(' | '):String(v));
+  Object.keys(lead).forEach(k=>{let v=lead[k];if(v==null||v==='')return;v=flat(v);if(v==='')return;fd.append(k.charAt(0)==='_'?k.slice(1):k,v)});
   if(pay){
     fd.append('mandat_version',pay.version);fd.append('mandat_unterzeichnet_am',pay.signed_at);fd.append('mandat_ort',pay.place);
-    fd.append('mandat_text',JSON.stringify(pay.text_snapshot,null,1));fd.append('mandat_sha256',pay.text_sha256);
-    fd.append('mandant_1',JSON.stringify(pay.mandant1));if(pay.mandant2)fd.append('mandant_2',String(pay.mandant2));
+    fd.append('mandat_sha256',pay.text_sha256);
+    const m1=pay.mandant1;fd.append('mandant_1',[m1.name,m1.street,(m1.zip+' '+m1.city).trim(),m1.phone,m1.email].filter(Boolean).join(', '));if(pay.mandant2)fd.append('mandant_2',String(pay.mandant2));
     let pdf=null;try{pdf=makeMandatePDF(lead,pay)}catch(e){console.error(e)}
     if(pdf)fd.append('Maklermandat_PDF',pdf,'Maklermandat-'+lead.lead_id+'.pdf');
-    else{const b1=dataURLtoBlob(pay.signature1_png);if(b1)fd.append('unterschrift_1',b1,'unterschrift-1.png');
+    else{fd.append('mandat_text',JSON.stringify(pay.text_snapshot,null,1));const b1=dataURLtoBlob(pay.signature1_png);if(b1)fd.append('unterschrift_1',b1,'unterschrift-1.png');
       const b2=pay.signature2_png&&dataURLtoBlob(pay.signature2_png);if(b2)fd.append('unterschrift_2',b2,'unterschrift-2.png')}
+  }
+  if(pay){ // Mit Anhang: Standard-Endpunkt (nimmt Dateien an); Antwort ist nicht lesbar, Netzwerkfehler werden erkannt
+    await fetch(FORM_URL_FILE,{method:'POST',mode:'no-cors',body:fd});return {success:true};
   }
   const r=await fetch(FORM_URL,{method:'POST',headers:{Accept:'application/json'},body:fd});
   if(!r.ok){let m='';try{m=((await r.json()).message)||''}catch(e){}throw new Error('HTTP '+r.status+(m?' – '+m:''))}
