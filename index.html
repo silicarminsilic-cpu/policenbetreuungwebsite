@@ -1350,8 +1350,9 @@ async function sendForm(lead,pay){
     const b2=pay.signature2_png&&dataURLtoBlob(pay.signature2_png);if(b2)fd.append('unterschrift_2',b2,'unterschrift-2.png');
   }
   const r=await fetch(FORM_URL,{method:'POST',headers:{Accept:'application/json'},body:fd});
-  if(!r.ok)throw new Error('http '+r.status);
-  const j=await r.json();if(!j||!(j.success===true||j.success==='true'))throw new Error('form');return j;
+  if(!r.ok){let m='';try{m=((await r.json()).message)||''}catch(e){}throw new Error('HTTP '+r.status+(m?' – '+m:''))}
+  let j=null;try{j=await r.json()}catch(e){}
+  if(!j||!(j.success===true||j.success==='true'))throw new Error('FormSubmit: '+((j&&j.message)||'keine gültige Antwort'));return j;
 }
 const apiLeads=l=>sendForm(l,null);
 const SUBERR='Ihre Anfrage konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder schreiben Sie uns an '+OPERATOR.mail+' bzw. rufen Sie uns an: '+OPERATOR.phone+'.';
@@ -1363,7 +1364,7 @@ async function submitForm(withMandate){
   try{
     if(withMandate){pay=await buildMandatePayload(lead);lead.mandate_status='Unterzeichnet';await sendForm(lead,pay)}
     else{lead.mandate_status='Vollmacht ausstehend';await apiLeads(lead)}
-  }catch(e){F.busy=false;F.subErr=SUBERR;renderForm();return}
+  }catch(e){console.error(e);F.busy=false;F.subErr=SUBERR+' [Details: '+(e&&e.message||e)+']';renderForm();return}
   F.busy=false;F.done=true;F.lead=lead;F.pay=pay;renderForm();track('form_submit_success',{campaign:F.camp||'allgemein',lang:F.d.lang,landing:CUR||'start',mandate:!!withMandate});if(withMandate)track('mandate_signed',{campaign:F.camp||'allgemein'});
 }
 function openForm(camp,pre){
@@ -1587,7 +1588,7 @@ document.addEventListener('submit',async e=>{
    preferred_language:call?d.lang:LANG,current_advisor_status:call?'Rückruf gewünscht':'Police in neue Betreuung geben',existing_policy_types:call?[]:[d.pol],service_interest:[call?'Rückruf':'Police direkt in neue Betreuung geben'],
    campaign_type:call?'rueckruf':'uebergabe',campaign_source:UTM.utm_source||'direct',campaign_medium:UTM.utm_medium||null,campaign_name:UTM.utm_campaign||null,landing_page:CUR||'start',lead_status:'Neu',assigned_partner:null,consent_version:'v1',consent_timestamp:new Date().toISOString(),marketing_opt_in:false,
    extra:{callback_window:call?QTIMES[+d.time]:null,insurer:call?null:d.co,policy_number:d.polnr||null}};
-  try{await apiLeads(lead)}catch(e){Q.busy=false;Q.subErr=SUBERR;renderQuick();return}
+  try{await apiLeads(lead)}catch(e){console.error(e);Q.busy=false;Q.subErr=SUBERR+' [Details: '+(e&&e.message||e)+']';renderQuick();return}
   Q.busy=false;Q.done=true;Q.lead=lead;renderQuick();track('quick_submit_success',{type:lead.campaign_type,landing:CUR||'start'});
 });
 window.addEventListener('hashchange',route);
